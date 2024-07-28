@@ -1,4 +1,5 @@
 #! /bin/bash    
 cd ~/vsc/obsidian-automation/     
 source .venv/bin/activate
-python fitness_tracker.py
+python tracker.py
+python heuristics.py
