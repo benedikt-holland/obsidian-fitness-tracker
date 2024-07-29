@@ -19,7 +19,7 @@ if __name__ == "__main__":
     history.check = pd.to_datetime(history.check)
     history["day_diff"] = history.check.rsub(pd.Timestamp.now()).dt.days
     # Count number of entries by column
-    cols = ["category", "subcategory", "full_name"]
+    cols = ["category", "subcategory"]
     group_cols = []
     for col in cols:
         group_cols.append(col)
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         dashboard[col + "_count"] = dashboard[col + "_count"].fillna(0)
     # Add to main df
     dashboard = dashboard.join(
-        history.groupby(group_cols).min().day_diff.rename("days"), on=group_cols
+        history.groupby(cols).min(numeric_only=True).day_diff.rename("days"), on=cols
     )
     # Calculate relative amounts
     total = history.shape[0]
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     goals.goal = goals.goal.astype(int)
     total = goals.goal.sum()
     group_cols = []
-    for col in ["category", "subcategory"]:
+    for col in cols:
         group_cols.append(col)
         goals = goals.join(
             goals.groupby(group_cols).sum()["goal"].rename(col),
@@ -53,11 +53,11 @@ if __name__ == "__main__":
         goals[col + "%"] = goals[col + "_total"] / total
         total = goals[col + "_total"]
     dashboard = dashboard.join(
-        goals.set_index(["category", "subcategory"]).add_suffix("_goal"),
-        on=["category", "subcategory"],
+        goals.set_index(cols).add_suffix("_goal"),
+        on=cols,
     )
     # Calculate score
-    for col in ["category", "subcategory"]:
+    for col in cols:
         # Score should always be positive
         # Higher score means the exercise was done less than expected
         # Lower score means the exercise was done more than expected
