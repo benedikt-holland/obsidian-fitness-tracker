@@ -3,13 +3,15 @@ import pandas as pd
 from os.path import exists
 import os
 from functions import read_md, to_md
+from dotenv import load_dotenv
 
 
 if __name__ == "__main__":
-    input = os.getenv("DASHBOARD")
-    output = os.getenv("HISTORY")
-    df = read_md(input)
-    if exists(output):
+    load_dotenv()
+    input_file = os.getenv("DASHBOARD")
+    output_file = os.getenv("HISTORY")
+    df = read_md(input_file)
+    if exists(output_file):
         history = pd.read_csv("history.csv", index_col=0)
     else:
         history = pd.DataFrame()
@@ -19,7 +21,7 @@ if __name__ == "__main__":
     done["date"] = pd.Timestamp.today().date()
     done.set_index("date", inplace=True)
     history = pd.concat([history, done])
-    history.to_csv(output)
+    history.to_csv(output_file)
     # Reset value
     df.loc[df.value != "", "last"] = df.loc[df.value != "", "value"]
     df.value = ""
