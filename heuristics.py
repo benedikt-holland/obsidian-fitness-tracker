@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Count number of entries by column
     cols = ["category", "subcategory"]
     group_cols = []
-    for col in cols:
+    for col in ["category", "subcategory", "full_name"]:
         group_cols.append(col)
         dashboard = dashboard.join(
             history.groupby(group_cols).count().check.rename(col),
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         dashboard["days"].fillna(dashboard.days.max()) * dashboard.score
     )
     dashboard = dashboard.sort_values(
-        ["day_score", "category", "subcategory", "name", "variant"], ascending=False
+        ["day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
     to_md(dashboard, os.getenv("DASHBOARD"))
