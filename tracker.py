@@ -1,8 +1,7 @@
 # Check a .md file in your obsidian vault and construct a time series
 import pandas as pd
 from os.path import exists
-from functions import read_md, to_md
-from dotenv import load_dotenv
+from functions import read_md, to_md 
 import argparse
 
 
@@ -15,7 +14,6 @@ if __name__ == "__main__":
         "-o", "--output-path", type=str, required=True
     )
     args = parser.parse_args()
-    load_dotenv()
     input_file = args.input_path
     output_file = args.output_path
     df = read_md(input_file)

@@ -1,6 +1,4 @@
 import pandas as pd
-from dotenv import load_dotenv
-import os
 from functions import read_md, to_md
 import argparse
 
@@ -21,7 +19,6 @@ if __name__ == "__main__":
         "-g", "--goal-file", type=str, required=True
     )
     args = parser.parse_args()
-    load_dotenv()
     history = pd.read_csv(args.history_file)
     history.rename({"Unnamed: 0": "check"}, axis=1, inplace=True)
     dashboard = read_md(args.dashboard_file)
