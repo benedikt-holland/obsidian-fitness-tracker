@@ -2,6 +2,7 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 from functions import read_md, to_md
+import argparse
 
 
 DAY_WEIGHT = 1
@@ -9,10 +10,21 @@ CATEGORY_WEIGHT = 1
 SUBCATEGORY_WEIGHT = 1
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add(
+        "-h", "--history-path", type=str, required=True
+    )
+    parser.add(
+        "-d", "--dashboard-file", type=str, required=True
+    )
+    parser.add(
+        "-g", "--goal-file", type=str, required=True
+    )
+    args = parser.parse_args()
     load_dotenv()
-    history = pd.read_csv(os.getenv("HISTORY"))
+    history = pd.read_csv(args.history_file)
     history.rename({"Unnamed: 0": "check"}, axis=1, inplace=True)
-    dashboard = read_md(os.getenv("DASHBOARD"))
+    dashboard = read_md(args.dashboard_file)
     orig_columns = dashboard.columns
     dashboard["full_name"] = dashboard.name + " " + dashboard.variant
     history["full_name"] = history.name + " " + history.variant
@@ -39,7 +51,7 @@ if __name__ == "__main__":
         dashboard[col.split("_")[0] + "%"] = (dashboard[col] / total).fillna(0)
         total = dashboard[col]
     # Goals contains the relative amount of category and subcategory counts wanted
-    goals = read_md(os.getenv("GOALS"))
+    goals = read_md(args.goal_file)
     goals.goal = goals.goal.astype(int)
     total = goals.goal.sum()
     group_cols = []
@@ -74,4 +86,4 @@ if __name__ == "__main__":
         ["day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
-    to_md(dashboard, os.getenv("DASHBOARD"))
+    to_md(dashboard, args.dashboard_file)
