@@ -9,17 +9,17 @@ SUBCATEGORY_WEIGHT = 1
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add(
-        "-h", "--history-path", type=str, required=True
+    parser.add_argument(
+        "-i", "--input-file", type=str, required=True
     )
-    parser.add(
+    parser.add_argument(
         "-d", "--dashboard-file", type=str, required=True
     )
-    parser.add(
+    parser.add_argument(
         "-g", "--goal-file", type=str, required=True
     )
     args = parser.parse_args()
-    history = pd.read_csv(args.history_file)
+    history = pd.read_csv(args.input_file)
     history.rename({"Unnamed: 0": "check"}, axis=1, inplace=True)
     dashboard = read_md(args.dashboard_file)
     orig_columns = dashboard.columns
