@@ -20,20 +20,20 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     history = pd.read_csv(args.input_file)
-    history.rename({"Unnamed: 0": "check"}, axis=1, inplace=True)
     dashboard = read_md(args.dashboard_file)
     orig_columns = dashboard.columns
     dashboard["full_name"] = dashboard.name + " " + dashboard.variant
+    dashboard["pin_bool"] = dashboard["pin"] != ""
     history["full_name"] = history.name + " " + history.variant
-    history.check = pd.to_datetime(history.check)
-    history["day_diff"] = history.check.rsub(pd.Timestamp.now()).dt.days
+    history.date = pd.to_datetime(history.date)
+    history["day_diff"] = history.date.rsub(pd.Timestamp.now()).dt.days
     # Count number of entries by column
     cols = ["category", "subcategory"]
     group_cols = []
     for col in ["category", "subcategory", "full_name"]:
         group_cols.append(col)
         dashboard = dashboard.join(
-            history.groupby(group_cols).count().check.rename(col),
+            history.groupby(group_cols).count().date.rename(col),
             on=group_cols,
             rsuffix="_count",
         )
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         dashboard["days"].fillna(dashboard.days.max()) * dashboard.score
     )
     dashboard = dashboard.sort_values(
-        ["day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, True, False] 
+        ["pin_bool", "day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
     to_md(dashboard, args.dashboard_file)
