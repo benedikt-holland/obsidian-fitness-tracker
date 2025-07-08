@@ -42,6 +42,9 @@ if __name__ == "__main__":
     dashboard = dashboard.join(
         history.groupby(cols).min(numeric_only=True).day_diff.rename("days"), on=cols
     )
+    dashboard = dashboard.join(
+        history.groupby("full_name").min(numeric_only=True)["day_diff"], on="full_name"
+    )
     # Calculate relative amounts
     total = history.shape[0]
     for col in [c + "_count" for c in cols]:
@@ -80,7 +83,7 @@ if __name__ == "__main__":
         dashboard["days"].fillna(dashboard.days.max()) * dashboard.score
     )
     dashboard = dashboard.sort_values(
-        ["pin_bool", "day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, False, True, False] 
+        ["pin_bool", "day_score", "category", "subcategory", "day_diff", "full_name"], ascending=[False, False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
     to_md(dashboard, args.dashboard_file)
