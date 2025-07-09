@@ -13,14 +13,11 @@ if __name__ == "__main__":
         "-i", "--input-file", type=str, required=True
     )
     parser.add_argument(
-        "-d", "--dashboard-file", type=str, required=True
-    )
-    parser.add_argument(
-        "-g", "--goal-file", type=str, required=True
+        "-o", "--output-file", type=str, required=True
     )
     args = parser.parse_args()
     history = pd.read_csv(args.input_file)
-    dashboard = read_md(args.dashboard_file)
+    dashboard = read_md(args.output_file)
     orig_columns = dashboard.columns
     dashboard["full_name"] = dashboard.name + " " + dashboard.variant
     dashboard["pin_bool"] = dashboard["pin"] != ""
@@ -51,8 +48,7 @@ if __name__ == "__main__":
         dashboard[col.split("_")[0] + "%"] = (dashboard[col] / total).fillna(0)
         total = dashboard[col]
     # Goals contains the relative amount of category and subcategory counts wanted
-    goals = read_md(args.goal_file)
-    goals.goal = goals.goal.astype(int)
+    goals = history.groupby(["category", "subcategory"]).mean(numeric_only=True)["goal"].dropna().reset_index()
     total = goals.goal.sum()
     group_cols = []
     for col in cols:
@@ -86,4 +82,4 @@ if __name__ == "__main__":
         ["pin_bool", "day_score", "category", "subcategory", "day_diff", "full_name"], ascending=[False, False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
-    to_md(dashboard, args.dashboard_file)
+    to_md(dashboard, args.output_file)
