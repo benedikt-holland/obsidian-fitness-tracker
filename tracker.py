@@ -1,5 +1,6 @@
 # Check a .md file in your obsidian vault and construct a time series
 import pandas as pd
+import numpy as np
 from os.path import exists
 from functions import read_md, to_md 
 import argparse
@@ -26,7 +27,7 @@ if __name__ == "__main__":
         history = pd.DataFrame()
     # Lines will be written to history if a column named 'value' contains a value
     if "max" in df.columns and "last" in df.columns:
-        df["max"] = df[["last", "max", "value"]].max(axis=1)
+        df["max"] = df[["last", "max", "value"]].replace("", np.nan).astype(float).max(axis=1).apply(lambda x: f"{int(x)}" if x.is_integer() else f"{x}")
         df.loc[df.value != "", "last"] = df.loc[df.value != "", "value"]
     done = df[df.value != ""].copy(deep=True)
     done["date"] = pd.Timestamp.today().date()
