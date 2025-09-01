@@ -20,7 +20,9 @@ if __name__ == "__main__":
     dashboard = read_md(args.output_file)
     orig_columns = dashboard.columns
     dashboard["full_name"] = dashboard.name + " " + dashboard.variant
-    dashboard["pin_bool"] = dashboard["pin"] != ""
+    dashboard["pin_score"] = 0
+    dashboard.loc[dashboard["pin"] != "", "pin_score"] = -1 
+    dashboard.loc[dashboard["pin"] == "x", "pin_score"] = 1
     history["full_name"] = history.name + " " + history.variant
     history.date = pd.to_datetime(history.date)
     history["day_diff"] = history.date.rsub(pd.Timestamp.now()).dt.days
@@ -79,7 +81,7 @@ if __name__ == "__main__":
         dashboard["days"].fillna(dashboard.days.max()) * dashboard.score
     )
     dashboard = dashboard.sort_values(
-        ["pin_bool", "day_score", "category", "subcategory", "day_diff", "full_name"], ascending=[False, False, False, False, True, False] 
+        ["pin_score", "day_score", "category", "subcategory", "day_diff", "full_name"], ascending=[False, False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
     to_md(dashboard, args.output_file)
