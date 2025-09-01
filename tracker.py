@@ -14,6 +14,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o", "--output-path", type=str, required=True
     )
+    parser.add_argument(
+        "-g", "--goal-path", type=str
+    )
     args = parser.parse_args()
     input_file = args.input_path
     output_file = args.output_path
@@ -29,6 +32,9 @@ if __name__ == "__main__":
     done = df[df.value != ""].copy(deep=True)
     done["date"] = pd.Timestamp.today().date()
     done.set_index("date", inplace=True)
+    if args.goal_path:
+        goals = read_md(args.goal_path)
+        done = done.join(goals.set_index(["category", "subcategory"]), on=["category", "subcategory"])
     history = pd.concat([history, done])
     history.to_csv(output_file)
     # Reset value
