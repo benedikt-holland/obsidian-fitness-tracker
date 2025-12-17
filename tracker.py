@@ -39,4 +39,6 @@ if __name__ == "__main__":
     history.to_csv(output_file)
     # Reset value
     df.value = ""
+    if "satisfaction" in df.columns:
+        df.satisfaction = "" 
     to_md(df, input_file)
