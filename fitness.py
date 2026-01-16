@@ -78,7 +78,7 @@ if __name__ == "__main__":
         dashboard["days"].fillna(dashboard.days.max()) * dashboard.score
     )
     dashboard = dashboard.sort_values(
-        ["pin_bool", "day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, False, True, False] 
+        ["pin_score", "day_score", "category", "subcategory", "full_name_count", "full_name"], ascending=[False, False, False, False, True, False] 
     )
     dashboard = dashboard[orig_columns]
     to_md(dashboard, args.output_file)
